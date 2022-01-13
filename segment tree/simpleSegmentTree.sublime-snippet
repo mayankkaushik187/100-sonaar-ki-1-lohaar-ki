@@ -1,0 +1,81 @@
+<snippet>
+	<content><![CDATA[
+	struct sgmntree {
+	int n;
+	vector<int> st;
+	void init(int _n) {
+		this->n = _n;
+		st.resize(4 * n, 0);
+	}
+
+	void build(int start, int ending, int node, vector<int> &arr) {
+		//base case
+		if (start == ending) {
+			st[node] = arr[start];
+			return;
+		}
+		//Find the mid
+		int mid = start + (ending - start) / 2;
+		//left subtree
+		build(start, mid, 2 * node + 1, arr);
+
+		//right subtree
+		build(mid + 1, ending, 2 * node + 2, arr);
+		//range summation
+		st[node] = st[2 * node + 1] + st[2 * node + 2];
+	}
+	void build(vector<int> &arr) {
+		build(0, n - 1, 0, arr);
+	}
+	//returns int because summation query
+	int query(int start, int ending, int givenLeft, int givenRight, int node) {
+		//case for no overlapping
+		//here start and ending are the node indexes of our segment tree and givenL_R's the range of the curr query
+		if (start > givenRight or ending < givenLeft) {
+			return 0;
+		}
+		//full overlap
+		// [givenLeft,..{start,...,ending}...givenRight]
+		if (start >= givenLeft and ending <= givenRight) {
+			return st[node];
+		}
+		//partial overlap
+		int mid = start + (ending - start) / 2;
+		int q1 = query(start, mid, givenLeft, givenRight, 2 * node + 1);
+		int q2 = query(mid + 1, ending, givenLeft, givenRight, 2 * node + 2);
+
+		return q1 + q2;
+	}
+
+
+	int query(int l, int r) {
+		return query(0, n - 1, l, r, 0);
+	}
+
+	void update(int start, int ending, int node, int index, int value) {
+		//base case
+		if (start == ending) {
+			st[node] = value;
+			return;
+		}
+
+		int mid = start + (ending - start) / 2;
+		if (index <= mid) {
+			update(start, mid, node * 2 + 1, index, value);
+		} else {
+			update(mid + 1 , ending, node * 2 + 2, index, value);
+		}
+
+		st[node] = st[2 * node + 1] + st[2 * node + 2];
+	}
+	void update(int index, int value) {
+		update(0, n - 1, 0, index, value);
+	}
+
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>segment-tree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

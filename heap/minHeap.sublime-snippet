@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+	priority_queue < int,vector<int>, greater<int> > pq;//push(), top(), pop()
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>min-heap</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.cpp</scope> -->
+</snippet>

@@ -1,0 +1,75 @@
+<snippet>
+	<content><![CDATA[
+	class Graph{
+	int V;
+	vector<pair<int,int>> *adj;
+	Graph(int V){
+		this->V = V;
+		adj = new vector<pair<int,int>>[V];
+	}
+	void addEdge(int x,int y,int w){
+		adj[x].push_back({w,y});
+		adj[y].push_back({w,x});
+	}
+	int prims_mst(){
+		priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+
+		vector<bool> visited(V,false);
+		pq.push({0,0});//weight and source
+		visited[0] = true;
+		int ans = 0;
+		while(!pq.empty()){
+			auto curr = pq.top();
+			pq.pop();
+			int weight = curr.first;
+			int toNode = curr.second;
+			if(visited[toNode])continue;
+			ans += weight;
+			visited[toNode] = true;
+			for(auto edge : adj[toNode]){
+				if(!visited[edge.first]){
+					pq.push({edge.second,edge.first});
+				}
+			}
+		}
+		return ans;
+	}
+	int djikstras(int src,int dest){
+		//Data structures
+		//set, dist arr
+		vector<int> dist(V,INT_MAX);
+		set<pair<int,int>> s;
+		//insert the src to set
+		dist[src] = 0;
+		s.insert({0,src});
+		while(!s.empty()){
+			auto it = s.begin();
+			int node = it->second;
+			int distTillNow = it->first;
+			s.erase(it);//pop
+			for(auto nbr : adj[node]){
+				int nbrNode = nbr.second;
+				int currEdgeDist = nbr.first;
+				if(currEdgeDist + distTillNow < dist[nbrNode]){
+					auto f = s.find({dist[nbrNode],nbrNode});
+
+					if(f!=s.end()){
+						s.erase(f);
+					}
+					dist[nbrNode] = currEdgeDist + distTillNow;
+					s.insert({dist[nbrNode],nbrNode});
+
+				}
+			}
+
+		}
+		return dist[dest];
+	}
+
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>graph-starter</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

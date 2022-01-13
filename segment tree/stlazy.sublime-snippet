@@ -1,0 +1,108 @@
+<snippet>
+	<content><![CDATA[
+	struct sgmntree {
+	int n;
+	vector<int>st, lazy;
+	void init(int _n) {
+		this->n = _n;
+		st.resize(4 * n, 0);
+		lazy.resize(4 * n, 0);
+	}
+	//build will stay the same as the previous segment treee
+
+	void build(int start, int ending, int node, vector<int>&arr) {
+		if (start == ending) {
+			st[node] = arr[start];
+			return;
+		}
+		int mid = start + (ending - start) / 2;
+		build(start, mid, 2 * node + 1, arr);
+		build(mid + 1, ending, 2 * node + 2, arr);
+
+		st[node] = st[2 * node + 1] + st[node * 2 + 2];
+	}
+	void build(vector<int>&arr) {
+		build(0, n - 1, 0, arr);
+	}
+	int query(int start, int ending, int l, int r, int node) {
+		//no overlap
+		if (r < start or ending < l) {
+			return 0;
+		}
+		//lazy propagation
+		//first step clear the lazynodes
+		if (lazy[node] != 0) {
+			st[node] += lazy[node] * (ending - start + 1);
+			if (start != ending) {
+				lazy[2 * node + 1] += lazy[node];
+				lazy[2 * node + 2] += lazy[node];
+			}
+			//make the parent node which propagated these values as 0
+			lazy[node] = 0;
+		}
+		//full overlap
+		if (l <= start and ending <= r) {
+			return st[node];
+		}
+		//partial overlap
+		int mid = start + (ending - start) / 2;
+		int ans1 = query(start, mid, l, r, 2 * node + 1);
+		int ans2 = query(mid + 1, ending, l, r, 2 * node + 2);
+
+		return ans1 + ans2;
+	}
+	int query(int l, int r) {
+		return query(0, n - 1, l, r, 0);
+	}
+	void update(int start, int ending, int node, int l, int r, int value) {
+		// non overlapping case
+		if (start > r || ending < l) {
+			return ;
+		}
+
+		// lazy propagation / clear the lazy update
+		if (lazy[node] != 0) {
+			// pending updates
+			// update the segment tree node
+			st[node] += lazy[node] * (ending - start + 1);
+			if (start != ending) {
+				// propagate the updated value
+				lazy[2 * node + 1] += lazy[node];
+				lazy[2 * node + 2] += lazy[node];
+			}
+			lazy[node] = 0;
+		}
+
+		// complete overlap
+		if (start >= l && ending <= r) {
+			st[node] += value * (ending - start + 1);
+			if (start != ending) {
+				lazy[2 * node + 1] += value;
+				lazy[2 * node + 2] += value;
+			}
+			return;
+		}
+
+		// partial case
+		int mid = (start + ending) / 2;
+
+		update(start, mid, 2 * node + 1, l, r, value);
+
+		update(mid + 1, ending, 2 * node + 2, l, r, value);
+
+		st[node] = st[node * 2 + 1] + st[node * 2 + 2];
+
+		return;
+
+	}
+	void update(int l, int r, int value) {
+		update(0, n - 1, 0, l, r, value);
+	}
+};
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>lazy</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>
